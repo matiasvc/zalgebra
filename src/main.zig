@@ -49,7 +49,7 @@ pub const Quat_f64 = quat.Quaternion;
 pub const Quaternion = quat.Quaternion;
 
 /// Convert degrees to radians.
-pub fn toRadians(degrees: anytype) @TypeOf(degrees) {
+pub inline fn toRadians(degrees: anytype) @TypeOf(degrees) {
     const T = @TypeOf(degrees);
 
     if (@typeInfo(T) != .float) {
@@ -60,7 +60,7 @@ pub fn toRadians(degrees: anytype) @TypeOf(degrees) {
 }
 
 /// Convert radians to degrees.
-pub fn toDegrees(radians: anytype) @TypeOf(radians) {
+pub inline fn toDegrees(radians: anytype) @TypeOf(radians) {
     const T = @TypeOf(radians);
 
     if (@typeInfo(T) != .float) {
@@ -72,7 +72,7 @@ pub fn toDegrees(radians: anytype) @TypeOf(radians) {
 
 /// Linear interpolation between two floats.
 /// `t` is used to interpolate between `from` and `to`.
-pub fn lerp(comptime T: type, from: T, to: T, t: T) T {
+pub inline fn lerp(comptime T: type, from: T, to: T, t: T) T {
     if (@typeInfo(T) != .float) {
         @compileError("Lerp not implemented for " ++ @typeName(T));
     }

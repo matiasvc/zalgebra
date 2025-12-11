@@ -36,7 +36,7 @@ pub fn Mat4x4(comptime T: type) type {
         const Self = @This();
 
         /// Shorthand for identity matrix.
-        pub fn identity() Self {
+        pub inline fn identity() Self {
             return .{
                 .data = .{
                     .{ 1, 0, 0, 0 },
@@ -48,18 +48,18 @@ pub fn Mat4x4(comptime T: type) type {
         }
 
         /// Shorthand for matrix with all zeros.
-        pub fn zero() Self {
+        pub inline fn zero() Self {
             return Self.set(0);
         }
 
         /// Set all mat4 values to given value.
-        pub fn set(value: T) Self {
+        pub inline fn set(value: T) Self {
             const data: [16]T = .{value} ** 16;
             return Self.fromSlice(&data);
         }
 
         /// Construct new 4x4 matrix from given slice.
-        pub fn fromSlice(data: *const [16]T) Self {
+        pub inline fn fromSlice(data: *const [16]T) Self {
             return .{
                 .data = .{
                     data[0..4].*,
@@ -71,7 +71,7 @@ pub fn Mat4x4(comptime T: type) type {
         }
 
         /// Negate the given matrix.
-        pub fn negate(self: Self) Self {
+        pub inline fn negate(self: Self) Self {
             var result = self;
             for (0..result.data.len) |column| {
                 for (0..result.data[column].len) |row| {
@@ -82,7 +82,7 @@ pub fn Mat4x4(comptime T: type) type {
         }
 
         /// Transpose the given matrix.
-        pub fn transpose(self: Self) Self {
+        pub inline fn transpose(self: Self) Self {
             var result = self;
             for (0..result.data.len) |column| {
                 for (column..4) |row| {
@@ -92,16 +92,16 @@ pub fn Mat4x4(comptime T: type) type {
             return result;
         }
 
-        pub fn getSlice(self: *const Self) *const [4][4]T {
+        pub inline fn getSlice(self: *const Self) *const [4][4]T {
             return self.data[0..4];
         }
 
         /// Return true if two matrices are equals.
-        pub fn eql(left: Self, right: Self) bool {
+        pub inline fn eql(left: Self, right: Self) bool {
             return meta.eql(left, right);
         }
 
-        pub fn mulByVec4(self: Self, v: Vector4) Vector4 {
+        pub inline fn mulByVec4(self: Self, v: Vector4) Vector4 {
             const x = (self.data[0][0] * v.x()) + (self.data[1][0] * v.y()) + (self.data[2][0] * v.z()) + (self.data[3][0] * v.w());
             const y = (self.data[0][1] * v.x()) + (self.data[1][1] * v.y()) + (self.data[2][1] * v.z()) + (self.data[3][1] * v.w());
             const z = (self.data[0][2] * v.x()) + (self.data[1][2] * v.y()) + (self.data[2][2] * v.z()) + (self.data[3][2] * v.w());
@@ -110,7 +110,7 @@ pub fn Mat4x4(comptime T: type) type {
             return Vector4.new(x, y, z, w);
         }
 
-        pub fn mulByVec3(self: Self, v: Vector3) Vector3 {
+        pub inline fn mulByVec3(self: Self, v: Vector3) Vector3 {
             const x = (self.data[0][0] * v.x()) + (self.data[1][0] * v.y()) + (self.data[2][0] * v.z()) + (self.data[3][0] * 1);
             const y = (self.data[0][1] * v.x()) + (self.data[1][1] * v.y()) + (self.data[2][1] * v.z()) + (self.data[3][1] * 1);
             const z = (self.data[0][2] * v.x()) + (self.data[1][2] * v.y()) + (self.data[2][2] * v.z()) + (self.data[3][2] * 1);
@@ -120,7 +120,7 @@ pub fn Mat4x4(comptime T: type) type {
 
         /// Construct 4x4 translation matrix by multiplying identity matrix and
         /// given translation vector.
-        pub fn fromTranslate(axis: Vector3) Self {
+        pub inline fn fromTranslate(axis: Vector3) Self {
             return .{
                 .data = .{
                     .{ 1, 0, 0, 0 },
@@ -132,28 +132,28 @@ pub fn Mat4x4(comptime T: type) type {
         }
 
         /// Make a translation between the given matrix and the given axis.
-        pub fn translate(self: Self, axis: Vector3) Self {
+        pub inline fn translate(self: Self, axis: Vector3) Self {
             const trans_mat = Self.fromTranslate(axis);
             return Self.mul(trans_mat, self);
         }
 
         /// Get translation Vec3 from current matrix.
-        pub fn extractTranslation(self: Self) Vector3 {
+        pub inline fn extractTranslation(self: Self) Vector3 {
             return Vector3.new(self.data[3][0], self.data[3][1], self.data[3][2]);
         }
 
         /// Get the up vector from a given 4x4 matrix
-        pub fn getUp(self: Self) Vector3 {
+        pub inline fn getUp(self: Self) Vector3 {
             return Vector3.new(self.data[0][1], self.data[1][1], self.data[2][1]);
         }
 
         /// Get the right vector from a given 4x4 matrix
-        pub fn getRight(self: Self) Vector3 {
+        pub inline fn getRight(self: Self) Vector3 {
             return Vector3.new(self.data[0][0], self.data[1][0], self.data[2][0]);
         }
 
         /// Get the right vector from a given 4x4 matrix
-        pub fn getForward(self: Self) Vector3 {
+        pub inline fn getForward(self: Self) Vector3 {
             return Vector3.new(self.data[0][2], self.data[1][2], self.data[2][2]);
         }
 
@@ -186,14 +186,14 @@ pub fn Mat4x4(comptime T: type) type {
             return result;
         }
 
-        pub fn rotate(self: Self, angle_in_degrees: T, axis: Vector3) Self {
+        pub inline fn rotate(self: Self, angle_in_degrees: T, axis: Vector3) Self {
             const rotation_mat = Self.fromRotation(angle_in_degrees, axis);
             return Self.mul(self, rotation_mat);
         }
 
         /// Construct a rotation matrix from euler angles (X * Y * Z).
         /// Order matters because matrix multiplication are NOT commutative.
-        pub fn fromEulerAngles(euler_angle: Vector3) Self {
+        pub inline fn fromEulerAngles(euler_angle: Vector3) Self {
             const x = Self.fromRotation(euler_angle.x(), Vector3.right());
             const y = Self.fromRotation(euler_angle.y(), Vector3.up());
             const z = Self.fromRotation(euler_angle.z(), Vector3.forward());
@@ -240,7 +240,7 @@ pub fn Mat4x4(comptime T: type) type {
             return Vector3.new(root.toDegrees(theta_x), root.toDegrees(theta_y), root.toDegrees(theta_z));
         }
 
-        pub fn fromScale(axis: Vector3) Self {
+        pub inline fn fromScale(axis: Vector3) Self {
             return .{
                 .data = .{
                     .{ axis.x(), 0, 0, 0 },
@@ -251,7 +251,7 @@ pub fn Mat4x4(comptime T: type) type {
             };
         }
 
-        pub fn scale(self: Self, axis: Vector3) Self {
+        pub inline fn scale(self: Self, axis: Vector3) Self {
             const scale_mat = Self.fromScale(axis);
             return Self.mul(scale_mat, self);
         }
@@ -267,7 +267,7 @@ pub fn Mat4x4(comptime T: type) type {
         /// Construct a perspective 4x4 matrix.
         /// Note: Field of view is given in degrees.
         /// Also for more details https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluPerspective.xml.
-        pub fn perspective(fovy_in_degrees: T, aspect_ratio: T, z_near: T, z_far: T) Self {
+        pub inline fn perspective(fovy_in_degrees: T, aspect_ratio: T, z_near: T, z_far: T) Self {
             const f = 1 / @tan(root.toRadians(fovy_in_degrees) * 0.5);
             const nf = 1 / (z_near - z_far);
 
@@ -285,7 +285,7 @@ pub fn Mat4x4(comptime T: type) type {
         /// Note: Field of view is given in degrees.
         /// Also for more details https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluPerspective.xml.
         /// For Reversed-Z details https://nlguillemot.wordpress.com/2016/12/07/reversed-z-in-opengl/
-        pub fn perspectiveReversedZ(fovy_in_degrees: T, aspect_ratio: T, z_near: T) Self {
+        pub inline fn perspectiveReversedZ(fovy_in_degrees: T, aspect_ratio: T, z_near: T) Self {
             const f = 1 / @tan(root.toRadians(fovy_in_degrees) * 0.5);
 
             return .{
@@ -299,7 +299,7 @@ pub fn Mat4x4(comptime T: type) type {
         }
 
         /// Construct an orthographic 4x4 matrix.
-        pub fn orthographic(left: T, right: T, bottom: T, top: T, z_near: T, z_far: T) Self {
+        pub inline fn orthographic(left: T, right: T, bottom: T, top: T, z_near: T, z_far: T) Self {
             var result = Self.zero();
 
             result.data[0][0] = 2 / (right - left);
@@ -315,7 +315,7 @@ pub fn Mat4x4(comptime T: type) type {
         }
 
         /// Right-handed lookAt function.
-        pub fn lookAt(eye: Vector3, target: Vector3, up: Vector3) Self {
+        pub inline fn lookAt(eye: Vector3, target: Vector3, up: Vector3) Self {
             const f = Vector3.sub(target, eye).norm();
             const s = Vector3.cross(f, up).norm();
             const u = Vector3.cross(s, f);
@@ -422,7 +422,7 @@ pub fn Mat4x4(comptime T: type) type {
         /// Return 4x4 matrix from given all transform components; `translation`, `rotation` and `scale`.
         /// The final order is T * R * S.
         /// Note: `rotation` could be `Vec3` (Euler angles) or a `quat`.
-        pub fn recompose(translation: Vector3, rotation: anytype, scalar: Vector3) Self {
+        pub inline fn recompose(translation: Vector3, rotation: anytype, scalar: Vector3) Self {
             var r = switch (@TypeOf(rotation)) {
                 Quaternion(T) => Quaternion(T).toMat4(rotation),
                 Vector3 => Self.fromEulerAngles(rotation),

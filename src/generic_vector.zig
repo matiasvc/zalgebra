@@ -91,17 +91,17 @@ pub fn GenericVector(comptime dimensions: comptime_int, comptime T: type) type {
                 }
 
                 /// Shorthand for (0, 0, 1).
-                pub fn forward() Self {
+                pub inline fn forward() Self {
                     return Self.new(0, 0, 1);
                 }
 
                 /// Shorthand for (0, 0, -1).
-                pub fn back() Self {
+                pub inline fn back() Self {
                     return Self.forward().negate();
                 }
 
                 /// Construct the cross product (as vector) from two vectors.
-                pub fn cross(first_vector: Self, second_vector: Self) Self {
+                pub inline fn cross(first_vector: Self, second_vector: Self) Self {
                     const x1 = first_vector.x();
                     const y1 = first_vector.y();
                     const z1 = first_vector.z();
@@ -139,12 +139,12 @@ pub fn GenericVector(comptime dimensions: comptime_int, comptime T: type) type {
                 }
 
                 /// Shorthand for (0, 0, 1, 0).
-                pub fn forward() Self {
+                pub inline fn forward() Self {
                     return Self.new(0, 0, 1, 0);
                 }
 
                 /// Shorthand for (0, 0, -1, 0).
-                pub fn back() Self {
+                pub inline fn back() Self {
                     return Self.forward().negate();
                 }
 
@@ -208,23 +208,23 @@ pub fn GenericVector(comptime dimensions: comptime_int, comptime T: type) type {
         pub const wMut = DimensionImpl.wMut;
 
         /// Set all components to the same given value.
-        pub fn set(val: T) Self {
+        pub inline fn set(val: T) Self {
             const result: Data = @splat(val);
             return .{ .data = result };
         }
 
         /// Shorthand for (0..).
-        pub fn zero() Self {
+        pub inline fn zero() Self {
             return set(0);
         }
 
         /// Shorthand for (1..).
-        pub fn one() Self {
+        pub inline fn one() Self {
             return set(1);
         }
 
         /// Shorthand for (0, 1).
-        pub fn up() Self {
+        pub inline fn up() Self {
             return switch (dimensions) {
                 2 => Self.new(0, 1),
                 3 => Self.new(0, 1, 0),
@@ -234,12 +234,12 @@ pub fn GenericVector(comptime dimensions: comptime_int, comptime T: type) type {
         }
 
         /// Shorthand for (0, -1).
-        pub fn down() Self {
+        pub inline fn down() Self {
             return up().negate();
         }
 
         /// Shorthand for (1, 0).
-        pub fn right() Self {
+        pub inline fn right() Self {
             return switch (dimensions) {
                 2 => Self.new(1, 0),
                 3 => Self.new(1, 0, 0),
@@ -249,7 +249,7 @@ pub fn GenericVector(comptime dimensions: comptime_int, comptime T: type) type {
         }
 
         /// Shorthand for (-1, 0).
-        pub fn left() Self {
+        pub inline fn left() Self {
             return right().negate();
         }
 
@@ -257,7 +257,7 @@ pub fn GenericVector(comptime dimensions: comptime_int, comptime T: type) type {
         pub const back = DimensionImpl.back;
 
         /// Negate the given vector.
-        pub fn negate(self: Self) Self {
+        pub inline fn negate(self: Self) Self {
             return self.scale(-1);
         }
 
@@ -279,7 +279,7 @@ pub fn GenericVector(comptime dimensions: comptime_int, comptime T: type) type {
         }
 
         /// Construct new vector from slice.
-        pub fn fromSlice(slice: []const T) Self {
+        pub inline fn fromSlice(slice: []const T) Self {
             const result = slice[0..dimensions].*;
             return .{ .data = result };
         }
@@ -293,42 +293,42 @@ pub fn GenericVector(comptime dimensions: comptime_int, comptime T: type) type {
         pub const toVec4 = DimensionImpl.toVec4;
 
         /// Transform vector to array.
-        pub fn toArray(self: Self) [dimensions]T {
+        pub inline fn toArray(self: Self) [dimensions]T {
             return self.data;
         }
 
         /// Return the angle (in degrees) between two vectors.
-        pub fn getAngle(first_vector: Self, second_vector: Self) T {
+        pub inline fn getAngle(first_vector: Self, second_vector: Self) T {
             const dot_product = dot(norm(first_vector), norm(second_vector));
             return root.toDegrees(math.acos(dot_product));
         }
 
         /// Return the length (magnitude) of given vector.
         /// √[x^2 + y^2 + z^2 ...]
-        pub fn length(self: Self) T {
+        pub inline fn length(self: Self) T {
             return @sqrt(self.dot(self));
         }
 
         /// Return the length (magnitude) squared of given vector.
         /// x^2 + y^2 + z^2 ...
-        pub fn lengthSq(self: Self) T {
+        pub inline fn lengthSq(self: Self) T {
             return self.dot(self);
         }
 
         /// Return the distance between two points.
         /// √[(x1 - x2)^2 + (y1 - y2)^2 + (z1 - z2)^2 ...]
-        pub fn distance(first_vector: Self, second_vector: Self) T {
+        pub inline fn distance(first_vector: Self, second_vector: Self) T {
             return length(first_vector.sub(second_vector));
         }
 
         /// Return the distance squared between two points.
         /// (x1 - x2)^2 + (y1 - y2)^2 + (z1 - z2)^2 ...
-        pub fn distanceSq(first_vector: Self, second_vector: Self) T {
+        pub inline fn distanceSq(first_vector: Self, second_vector: Self) T {
             return lengthSq(first_vector.sub(second_vector));
         }
 
         /// Construct new normalized vector from a given one.
-        pub fn norm(self: Self) Self {
+        pub inline fn norm(self: Self) Self {
             const l = self.length();
             if (l == 0) {
                 return self;
@@ -338,60 +338,60 @@ pub fn GenericVector(comptime dimensions: comptime_int, comptime T: type) type {
         }
 
         /// Return true if two vectors are equals.
-        pub fn eql(first_vector: Self, second_vector: Self) bool {
+        pub inline fn eql(first_vector: Self, second_vector: Self) bool {
             return @reduce(.And, first_vector.data == second_vector.data);
         }
 
         /// Substraction between two given vector.
-        pub fn sub(first_vector: Self, second_vector: Self) Self {
+        pub inline fn sub(first_vector: Self, second_vector: Self) Self {
             const result = first_vector.data - second_vector.data;
             return .{ .data = result };
         }
 
         /// Addition betwen two given vector.
-        pub fn add(first_vector: Self, second_vector: Self) Self {
+        pub inline fn add(first_vector: Self, second_vector: Self) Self {
             const result = first_vector.data + second_vector.data;
             return .{ .data = result };
         }
 
         /// Component wise multiplication betwen two given vector.
-        pub fn mul(first_vector: Self, second_vector: Self) Self {
+        pub inline fn mul(first_vector: Self, second_vector: Self) Self {
             const result = first_vector.data * second_vector.data;
             return .{ .data = result };
         }
 
         /// Component wise division betwen two given vector.
-        pub fn div(first_vector: Self, second_vector: Self) Self {
+        pub inline fn div(first_vector: Self, second_vector: Self) Self {
             const result = first_vector.data / second_vector.data;
             return .{ .data = result };
         }
 
         /// Construct vector from the max components in two vectors
-        pub fn max(first_vector: Self, second_vector: Self) Self {
+        pub inline fn max(first_vector: Self, second_vector: Self) Self {
             const result = @max(first_vector.data, second_vector.data);
             return .{ .data = result };
         }
 
         /// Construct vector from the min components in two vectors
-        pub fn min(first_vector: Self, second_vector: Self) Self {
+        pub inline fn min(first_vector: Self, second_vector: Self) Self {
             const result = @min(first_vector.data, second_vector.data);
             return .{ .data = result };
         }
 
         /// Construct new vector after multiplying each components by a given scalar
-        pub fn scale(self: Self, scalar: T) Self {
+        pub inline fn scale(self: Self, scalar: T) Self {
             const result = self.data * @as(Data, @splat(scalar));
             return .{ .data = result };
         }
 
         /// Return the dot product between two given vector.
         /// (x1 * x2) + (y1 * y2) + (z1 * z2) ...
-        pub fn dot(first_vector: Self, second_vector: Self) T {
+        pub inline fn dot(first_vector: Self, second_vector: Self) T {
             return @reduce(.Add, first_vector.data * second_vector.data);
         }
 
         /// Linear interpolation between two vectors
-        pub fn lerp(first_vector: Self, second_vector: Self, t: T) Self {
+        pub inline fn lerp(first_vector: Self, second_vector: Self, t: T) Self {
             const from = first_vector.data;
             const to = second_vector.data;
 
@@ -403,7 +403,7 @@ pub fn GenericVector(comptime dimensions: comptime_int, comptime T: type) type {
         pub const cross = DimensionImpl.cross;
 
         /// Comptime vector component swizzle. Accepts component names, 0, or 1.
-        pub fn swizzle(self: Self, comptime comps: []const u8) SwizzleType(comps.len) {
+        pub inline fn swizzle(self: Self, comptime comps: []const u8) SwizzleType(comps.len) {
             // Someone doing a single component swizzle with 0 or 1 is weird but... it's supported...
             if (comps.len == 1) {
                 return switch (comps[0]) {

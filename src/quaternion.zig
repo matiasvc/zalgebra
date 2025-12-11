@@ -39,7 +39,7 @@ pub fn Quaternion(comptime T: type) type {
         const Self = @This();
 
         /// Construct new quaternion from floats.
-        pub fn new(w: T, x: T, y: T, z: T) Self {
+        pub inline fn new(w: T, x: T, y: T, z: T) Self {
             return .{
                 .w = w,
                 .x = x,
@@ -49,33 +49,33 @@ pub fn Quaternion(comptime T: type) type {
         }
 
         /// Shorthand for (1, 0, 0, 0).
-        pub fn identity() Self {
+        pub inline fn identity() Self {
             return Self.new(1, 0, 0, 0);
         }
 
         /// Set all components to the same given value.
-        pub fn set(val: T) Self {
+        pub inline fn set(val: T) Self {
             return Self.new(val, val, val, val);
         }
 
         /// Construct new quaternion from slice.
         /// Note: Careful, the latest component `slice[3]` is the `W` component.
-        pub fn fromSlice(slice: []const T) Self {
+        pub inline fn fromSlice(slice: []const T) Self {
             return Self.new(slice[3], slice[0], slice[1], slice[2]);
         }
 
         // Construct new quaternion from given `W` component and Vector3.
-        pub fn fromVec3(w: T, axis: Vector3) Self {
+        pub inline fn fromVec3(w: T, axis: Vector3) Self {
             return Self.new(w, axis.x(), axis.y(), axis.z());
         }
 
         /// Return true if two quaternions are equal.
-        pub fn eql(left: Self, right: Self) bool {
+        pub inline fn eql(left: Self, right: Self) bool {
             return meta.eql(left, right);
         }
 
         /// Construct new normalized quaternion from a given one.
-        pub fn norm(self: Self) Self {
+        pub inline fn norm(self: Self) Self {
             const l = length(self);
             if (l == 0) {
                 return self;
@@ -89,12 +89,12 @@ pub fn Quaternion(comptime T: type) type {
         }
 
         /// Return the length (magnitude) of quaternion.
-        pub fn length(self: Self) T {
+        pub inline fn length(self: Self) T {
             return @sqrt(self.dot(self));
         }
 
         /// Substraction between two quaternions.
-        pub fn sub(left: Self, right: Self) Self {
+        pub inline fn sub(left: Self, right: Self) Self {
             return Self.new(
                 left.w - right.w,
                 left.x - right.x,
@@ -104,7 +104,7 @@ pub fn Quaternion(comptime T: type) type {
         }
 
         /// Addition between two quaternions.
-        pub fn add(left: Self, right: Self) Self {
+        pub inline fn add(left: Self, right: Self) Self {
             return Self.new(
                 left.w + right.w,
                 left.x + right.x,
@@ -125,7 +125,7 @@ pub fn Quaternion(comptime T: type) type {
         }
 
         /// Multiply each component by the given scalar.
-        pub fn scale(mat: Self, scalar: T) Self {
+        pub inline fn scale(mat: Self, scalar: T) Self {
             const w = mat.w * scalar;
             const x = mat.x * scalar;
             const y = mat.y * scalar;
@@ -135,12 +135,12 @@ pub fn Quaternion(comptime T: type) type {
         }
 
         /// Negate the given quaternion
-        pub fn negate(self: Self) Self {
+        pub inline fn negate(self: Self) Self {
             return self.scale(-1);
         }
 
         /// Return the dot product between two quaternion.
-        pub fn dot(left: Self, right: Self) T {
+        pub inline fn dot(left: Self, right: Self) T {
             return (left.x * right.x) + (left.y * right.y) + (left.z * right.z) + (left.w * right.w);
         }
 
@@ -261,7 +261,7 @@ pub fn Quaternion(comptime T: type) type {
         }
 
         /// Convert all Euler angles (in degrees) to quaternion.
-        pub fn fromEulerAngles(axis_in_degrees: Vector3) Self {
+        pub inline fn fromEulerAngles(axis_in_degrees: Vector3) Self {
             const x = Self.fromAxis(axis_in_degrees.x(), Vector3.right());
             const y = Self.fromAxis(axis_in_degrees.y(), Vector3.up());
             const z = Self.fromAxis(axis_in_degrees.z(), Vector3.forward());
@@ -270,7 +270,7 @@ pub fn Quaternion(comptime T: type) type {
         }
 
         /// Convert Euler angle around specified axis to quaternion.
-        pub fn fromAxis(degrees: T, axis: Vector3) Self {
+        pub inline fn fromAxis(degrees: T, axis: Vector3) Self {
             const radians = root.toRadians(degrees);
 
             const rot_sin = @sin(radians / 2);
@@ -324,13 +324,13 @@ pub fn Quaternion(comptime T: type) type {
         }
 
         /// Construct inverse quaternion
-        pub fn inv(self: Self) Self {
+        pub inline fn inv(self: Self) Self {
             const res = Self.new(self.w, -self.x, -self.y, -self.z);
             return res.scale(1 / self.dot(self));
         }
 
         /// Linear interpolation between two quaternions.
-        pub fn lerp(left: Self, right: Self, t: T) Self {
+        pub inline fn lerp(left: Self, right: Self, t: T) Self {
             const w = root.lerp(T, left.w, right.w, t);
             const x = root.lerp(T, left.x, right.x, t);
             const y = root.lerp(T, left.y, right.y, t);
@@ -341,7 +341,7 @@ pub fn Quaternion(comptime T: type) type {
         // Shortest path slerp between two quaternions.
         // Taken from "Physically Based Rendering, 3rd Edition, Chapter 2.9.2"
         // https://pbr-book.org/3ed-2018/Geometry_and_Transformations/Animating_Transformations#QuaternionInterpolation
-        pub fn slerp(left: Self, right: Self, t: T) Self {
+        pub inline fn slerp(left: Self, right: Self, t: T) Self {
             const ParallelThreshold = 0.9995;
             var cos_theta = dot(left, right);
             var right1 = right;
@@ -365,7 +365,7 @@ pub fn Quaternion(comptime T: type) type {
 
         /// Rotate the Vector3 v using the sandwich product.
         /// Taken from "Foundations of Game Engine Development Vol. 1 Mathematics".
-        pub fn rotateVec(self: Self, v: Vector3) Vector3 {
+        pub inline fn rotateVec(self: Self, v: Vector3) Vector3 {
             const q = self.norm();
             const b = Vector3.new(q.x, q.y, q.z);
             const b2 = b.dot(b);

@@ -27,7 +27,7 @@ pub fn Mat3x3(comptime T: type) type {
         const Self = @This();
 
         /// Shorthand for identity matrix.
-        pub fn identity() Self {
+        pub inline fn identity() Self {
             return .{
                 .data = .{
                     .{ 1, 0, 0 },
@@ -38,18 +38,18 @@ pub fn Mat3x3(comptime T: type) type {
         }
 
         /// Shorthand for matrix with all zeros.
-        pub fn zero() Self {
+        pub inline fn zero() Self {
             return Self.set(0);
         }
 
         /// Set all mat3 values to given value.
-        pub fn set(value: T) Self {
+        pub inline fn set(value: T) Self {
             const data: [9]T = .{value} ** 9;
             return Self.fromSlice(&data);
         }
 
         /// Construct new 3x3 matrix from given slice.
-        pub fn fromSlice(data: *const [9]T) Self {
+        pub inline fn fromSlice(data: *const [9]T) Self {
             return .{
                 .data = .{
                     data[0..3].*,
@@ -60,7 +60,7 @@ pub fn Mat3x3(comptime T: type) type {
         }
 
         /// Negate the given matrix.
-        pub fn negate(self: Self) Self {
+        pub inline fn negate(self: Self) Self {
             var result = self;
             for (0..result.data.len) |column| {
                 for (0..result.data[column].len) |row| {
@@ -71,7 +71,7 @@ pub fn Mat3x3(comptime T: type) type {
         }
 
         /// Transpose the given matrix.
-        pub fn transpose(self: Self) Self {
+        pub inline fn transpose(self: Self) Self {
             var result = self;
             for (0..result.data.len) |column| {
                 for (column..result.data[column].len) |row| {
@@ -81,16 +81,16 @@ pub fn Mat3x3(comptime T: type) type {
             return result;
         }
 
-        pub fn getSlice(self: *const Self) *const [3][3]T {
+        pub inline fn getSlice(self: *const Self) *const [3][3]T {
             return self.data[0..3];
         }
 
         /// Return true if two matrices are equals.
-        pub fn eql(left: Self, right: Self) bool {
+        pub inline fn eql(left: Self, right: Self) bool {
             return meta.eql(left, right);
         }
 
-        pub fn mulByVec3(self: Self, v: Vector3) Vector3 {
+        pub inline fn mulByVec3(self: Self, v: Vector3) Vector3 {
             const x = (self.data[0][0] * v.x()) + (self.data[1][0] * v.y()) + (self.data[2][0] * v.z());
             const y = (self.data[0][1] * v.x()) + (self.data[1][1] * v.y()) + (self.data[2][1] * v.z());
             const z = (self.data[0][2] * v.x()) + (self.data[1][2] * v.y()) + (self.data[2][2] * v.z());
@@ -131,7 +131,7 @@ pub fn Mat3x3(comptime T: type) type {
             return result;
         }
 
-        pub fn rotate(self: Self, angle_in_degrees: T, axis: Vector3) Self {
+        pub inline fn rotate(self: Self, angle_in_degrees: T, axis: Vector3) Self {
             if (@typeInfo(T) != .float) {
                 @compileError("Mat3x3.rotate() not implemented for " ++ @typeName(T));
             }
@@ -142,7 +142,7 @@ pub fn Mat3x3(comptime T: type) type {
 
         /// Construct a rotation matrix from euler angles (X * Y * Z).
         /// Order matters because matrix multiplication are NOT commutative.
-        pub fn fromEulerAngles(euler_angle: Vector3) Self {
+        pub inline fn fromEulerAngles(euler_angle: Vector3) Self {
             if (@typeInfo(T) != .float) {
                 @compileError("Mat3x3.fromEulerAngles() not implemented for " ++ @typeName(T));
             }
@@ -201,7 +201,7 @@ pub fn Mat3x3(comptime T: type) type {
             return Vector3.new(root.toDegrees(theta_x), root.toDegrees(theta_y), root.toDegrees(theta_z));
         }
 
-        pub fn fromScale(axis: Vector3) Self {
+        pub inline fn fromScale(axis: Vector3) Self {
             var result = Self.identity();
 
             result.data[0][0] = axis.x();
@@ -211,7 +211,7 @@ pub fn Mat3x3(comptime T: type) type {
             return result;
         }
 
-        pub fn scale(self: Self, axis: Vector3) Self {
+        pub inline fn scale(self: Self, axis: Vector3) Self {
             const scale_mat = Self.fromScale(axis);
             return Self.mul(scale_mat, self);
         }
